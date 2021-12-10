@@ -1,0 +1,8 @@
+deltaT makes hist of time between joint events
+mkdir build
+cd build
+cmake ../
+make
+
+./deltaT File1.txt File2.txt,
+where *.txt contains the times of event to search for joint events
