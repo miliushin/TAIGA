@@ -51,12 +51,12 @@ void MakeRoot(const char *name) {
 
   for (int i = 31; i < 31 + NUMBER_OF_STATIONS; i++) {
     sprintf(NstName, "%d", i);
-    TData[i] = new TTree(NstName, "TAIGA-GRANDE data");
-    TData[i]->Branch("NumberOfEvent", &NubmerOfEvent, "NumberOfEvent/I");
-    TData[i]->Branch("TimeEvent", &TimeEvent, "TimeEvent/D");
-    TData[i]->Branch("ADC", ADC, "ADC[12][1024]/I");
+    TData[i-31] = new TTree(NstName, "TAIGA-GRANDE data");
+    TData[i-31]->Branch("NumberOfEvent", &NubmerOfEvent, "NumberOfEvent/I");
+    TData[i-31]->Branch("TimeEvent", &TimeEvent, "TimeEvent/D");
+    TData[i-31]->Branch("ADC", ADC, "ADC[12][1024]/I");
     // TData[i]->Branch("METEO",ADC,"ADC/D");
-    TData[i]->Write();
+    TData[i-31]->Write();
   }
 
   for (int i = 0; i < NUMBER_OF_STATIONS; i++) {
