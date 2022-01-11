@@ -1,3 +1,3 @@
 # TAIGA
 
-Program **programs/TMuon** -
+**programs/TMuon** makes DDMMYY.root file from RAW data of TAIGA-MUON
