@@ -113,7 +113,7 @@ int MUON::ReadADC(FILE* data_file) {
 
     fread(data_read, NumBytes, 1, data_file);
 
-    for (int ich = 0; ich < NUMBER_OF_CHANEL; ich++) {
+    for (int ich = 0; ich < NUMBER_OF_CHANNELS; ich++) {
       for (int ibin = 0; ibin < Aperture; ibin++) {
         data[ich][ibin] = 0;
       }
@@ -150,7 +150,7 @@ int MUON::ReadADC(FILE* data_file) {
       return -1;
     }
 
-    for (int i = 0; i < MAX_OF_CHANNELS; i++) {
+    for (int i = 0; i < NUMBER_OF_CHANNELS; i++) {
       for (int j = 0; j < Aperture; j++) {
         ADC[i][j] = (double)data[i][j];
       }

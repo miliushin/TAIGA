@@ -11,7 +11,7 @@
 
 using namespace std;
 
-string DAYS[MAX_OF_DAYS];
+string DAYS[MAX_DAYS];
 
 string GetDay(const char *name) {
   int len = strlen(name);
@@ -37,15 +37,15 @@ void MakeRoot(const char *name) {
   NstName[3] = 0;
   sprintf(OutName, "%s.root", name);
   TFile *OutRoot = new TFile(OutName, "RECREATE");
-  TTree *TData[MAX_OF_STATIONS];
+  TTree *TData[NUMBER_OF_STATIONS];
 
   Int_t NubmerOfEvent;
   Double_t TimeEvent;
-  Double_t ADC[MAX_OF_CHANNELS][Aperture];
+  Double_t ADC[NUMBER_OF_CHANNELS][Aperture];
   Double_t METEO[3];
   Int_t Ncounts = Aperture;
 
-  for (int i = 1; i < MAX_OF_STATIONS + 1; i++) {
+  for (int i = 1; i < NUMBER_OF_STATIONS + 1; i++) {
     sprintf(NstName, "%d", i);
     TData[i] = new TTree(NstName, "TAIGA-MUON data");
     TData[i]->Branch("NumberOfEvent", &NubmerOfEvent, "NumberOfEvent/I");
@@ -55,7 +55,7 @@ void MakeRoot(const char *name) {
     TData[i]->Write();
   }
 
-  for (int i = 0; i < MAX_OF_STATIONS; i++) {
+  for (int i = 0; i < NUMBER_OF_STATIONS; i++) {
     delete TData[i];
   }
   OutRoot->Close();
