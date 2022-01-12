@@ -43,11 +43,11 @@ void MakeRoot(const char *name) {
   TFile *OutRoot = new TFile(OutName, "RECREATE");
   TTree *TData[NUMBER_OF_STATIONS];
 
-  Int_t NubmerOfEvent;
+  Int_t    NubmerOfEvent;
   Double_t TimeEvent;
-  Double_t ADC[NUMBER_OF_CHANNELS][Aperture];
+  Int_t    ADC[NUMBER_OF_CHANNELS][Aperture];
   Double_t METEO[3];
-  Int_t Ncounts = Aperture;
+  Int_t    Ncounts = Aperture;
 
   for (int i = 31; i < 31 + NUMBER_OF_STATIONS; i++) {
     sprintf(NstName, "%d", i);
