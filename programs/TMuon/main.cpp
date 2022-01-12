@@ -41,7 +41,7 @@ void MakeRoot(const char *name) {
 
   Int_t NubmerOfEvent;
   Double_t TimeEvent;
-  Double_t ADC[NUMBER_OF_CHANNELS][Aperture];
+  Int_t    ADC[NUMBER_OF_CHANNELS][Aperture];
   Double_t METEO[3];
   Int_t Ncounts = Aperture;
 
@@ -49,7 +49,7 @@ void MakeRoot(const char *name) {
     sprintf(NstName, "%d", i);
     TData[i] = new TTree(NstName, "TAIGA-MUON data");
     TData[i]->Branch("NumberOfEvent", &NubmerOfEvent, "NumberOfEvent/I");
-    TData[i]->Branch("TimeEvent", &TimeEvent, "TimeEvent/D");
+    TData[i]->Branch("TimeEvent", &TimeEvent, "TimeEvent/I");
     TData[i]->Branch("ADC", ADC, "ADC[12][1024]/D");
     // TData[i]->Branch("METEO",ADC,"ADC/D");
     TData[i]->Write();
