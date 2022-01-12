@@ -25,7 +25,7 @@ class MUON {
 
  private:
   double TimeEvent;
-  double ADC[NUMBER_OF_CHANNELS][Aperture];
+  int    ADC[NUMBER_OF_CHANNELS][Aperture];
   unsigned long int END_File;
   unsigned long int i_File;
 
