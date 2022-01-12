@@ -49,7 +49,7 @@ void MakeRoot(const char *name) {
     sprintf(NstName, "%d", i);
     TData[i] = new TTree(NstName, "TAIGA-MUON data");
     TData[i]->Branch("NumberOfEvent", &NubmerOfEvent, "NumberOfEvent/I");
-    TData[i]->Branch("TimeEvent", &TimeEvent, "TimeEvent/I");
+    TData[i]->Branch("TimeEvent", &TimeEvent, "TimeEvent/D");
     TData[i]->Branch("ADC", ADC, "ADC[12][1024]/I");
     // TData[i]->Branch("METEO",ADC,"ADC/D");
     TData[i]->Write();
