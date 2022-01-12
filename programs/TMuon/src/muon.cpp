@@ -152,7 +152,7 @@ int MUON::ReadADC(FILE* data_file) {
 
     for (int i = 0; i < NUMBER_OF_CHANNELS; i++) {
       for (int j = 0; j < Aperture; j++) {
-        ADC[i][j] = (double)data[i][j];
+        ADC[i][j] = data[i][j];
       }
     }
 
