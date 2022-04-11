@@ -46,7 +46,7 @@ class DATA {
   int         AMP_ADC;              // Max amplitude of PMT pulse
   double      TIME_ADC;             // Time of PMT pulse
   double      TimeSt[MAX_OF_EVEN];  // Time Station in sec
-  double      DeltaT;               // Time between events
+  double      DelT;               // Time between events
 
   double      TimeCounter[NUM_OF_CHANNELS];
   double      IntegCounter[NUM_OF_CHANNELS];

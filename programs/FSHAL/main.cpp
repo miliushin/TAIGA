@@ -9,6 +9,7 @@
 
 #include "data.h"
 #include "coin3D.h"
+#include "axis.h"
 
 using namespace std;
 
@@ -67,8 +68,8 @@ void MakeRoot(const char *name) {
     gDirectory->mkdir("Integral");
     gDirectory->mkdir("DeltaT");
   }
-  OutRoot->cd();
-  gDirectory->mkdir("Angles");
+  //OutRoot->cd();
+  //gDirectory->mkdir("Angles");
   OutRoot->Close();
      // OutRoot_tmp->cd();
 
@@ -105,7 +106,6 @@ void MakeRoot(const char *name) {
 }
 
 int main(int argc, char **argv) {
-  FILE *file_data;
   string file;
   string day;
   ifstream FileList;
@@ -159,9 +159,11 @@ int main(int argc, char **argv) {
     DATA *date = new DATA(file.c_str());
     delete date;
 
-    Coin3D *coin = new Coin3D(OutName,OutName_tmp);
+    Coin3D *coin = new Coin3D(OutName_tmp);
     delete coin;
 
+    Axis *ax = new Axis(OutName,OutName_tmp);
+    delete ax;
 
   }
   return 0;

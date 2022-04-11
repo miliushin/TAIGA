@@ -72,7 +72,7 @@ DATA::DATA(const char *File) {
 
     Long64_t nentries = TData[i]->GetEntries();
     for (Long64_t j = 0; j < nentries; j++) {
-
+      //TimeEvent -=10.;                            
       if (j > MAX_OF_EVEN) {
         printf("ERROR: Events more MAX_OF_EVEN = %d\n", MAX_OF_EVEN);
         exit(1);
@@ -81,14 +81,14 @@ DATA::DATA(const char *File) {
 
       TimeSt[j] = TimeEvent;
       if (j > 0) {
-        DeltaT = TimeSt[j] - TimeSt[j - 1];
-        if (DeltaT < 0) DeltaT *= -1.;
-        HDeltaT->Fill(DeltaT);
+        DelT = TimeSt[j] - TimeSt[j - 1];
+        if (DelT < 0) DelT *= -1.;
+        HDeltaT->Fill(DelT);
       }
 
       int grande_status = 10;
-      bool FlagStat = false;
-
+      bool FlagStat1 = false;
+      bool FlagStat2 = false;
 
 
       for (int k = 0; k < NUM_OF_CHANNELS; k++) {
@@ -100,7 +100,6 @@ DATA::DATA(const char *File) {
         AMP_ADC  = 0;
         TIME_ADC = 0.;
         
-
       
         if(atoi(NstName)<=3) GetIA_MUON(ADC[k]);
         else if(atoi(NstName)>3) {
@@ -111,40 +110,60 @@ DATA::DATA(const char *File) {
             if (grande_status == 0){
               INT_ADC /= 10.;
               AMP_ADC /= 10;
-              FlagStat = true;
+              FlagStat1 = true;
 
             }
           }
-          /*
-          if (k==1 && FlagStat==true){
-            grande_status=GetIA_GRANDE(k,ADC[k]);
-            double a2 = double(AMP_ADC);
 
-            if(grande_status==0) {
-              dif = (double(a1)/10. - a2)/a2;
-            }
-          }
-          */
 
-          if (k==1 && FlagStat == false){
+          if (k==1 && FlagStat1 == false){
             grande_status = GetIA_GRANDE(k,ADC[k]);
-            if(grande_status==0) FlagStat = true;
+            if(grande_status==0) FlagStat1 = true;
           }
-          else if(k==1) {FlagStat = false; continue;}
+          else if(k==1 && FlagStat1==true){
+            continue;
+          }
       
           if (k==2){
             grande_status = GetIA_GRANDE(k,ADC[k]);
             if (grande_status == 0){
               INT_ADC /= 10.;
               AMP_ADC /= 10;
-              FlagStat = true;
+              FlagStat2 = true;
             }
           }
-          if (k==3 && FlagStat==false){
+
+          if (k==3 && FlagStat2==false){
             grande_status = GetIA_GRANDE(k,ADC[k]);
-            if(grande_status==0) FlagStat = true;
+            if(grande_status==0) FlagStat2 = true;
           }
-          else if(k==3) {FlagStat = false; continue;}
+          else if(k==3 && FlagStat2==true){
+            continue;
+          }
+
+          if (k==5 && FlagStat1==false){
+            grande_status = GetIA_GRANDE(k,ADC[k]);
+            if (grande_status == 0){
+              INT_ADC *= 10.;
+              AMP_ADC *= 10;
+              FlagStat1 = true;
+            }
+          }
+          else if(k==5 && FlagStat1==true){
+            continue;
+          }
+
+          if (k==7 && FlagStat2==false){
+            grande_status = GetIA_GRANDE(k,ADC[k]);
+            if (grande_status == 0){
+              INT_ADC *= 10.;
+              AMP_ADC *= 10;
+              FlagStat2 = true;
+            }
+          }
+          else if(k==7 && FlagStat2==true){
+            continue;
+          }
 
         }
         //hh ->Fill(dif);
@@ -156,31 +175,27 @@ DATA::DATA(const char *File) {
           HAmpl[k]->Fill(AMP_ADC);     
           AmplCounter[k] = AMP_ADC;
           IntegCounter[k] = INT_ADC;
-          TimeCounter[k] = TIME_ADC + TimeEvent;
+          TimeCounter[k] = TIME_ADC + TimeEvent - 400.E-9*5.; // 0 - 512 ADC
         }
         else if(AMP_ADC>0 && atoi(NstName)>30){
           
-          if (k==0) jj = 0;
-          if (k==1) jj = 0;
-          if (k==2) jj = 1;
-          if (k==3) jj = 1;
-          if (k<4 && FlagStat==true){
-         
+          if (k==0 || k==1 || k==5) jj = 0;
+          if (k==2 || k==3 || k==7) jj = 1;
+          
+          if ((jj==0 && FlagStat1==true) || (jj==1 && FlagStat2==true)){
             HInteg[jj]->Fill(INT_ADC);
             HAmpl[jj]->Fill(AMP_ADC);     
             AmplCounter[jj] = AMP_ADC;
             IntegCounter[jj] = INT_ADC;
-            TimeCounter[jj] = TIME_ADC + TimeEvent;
+            TimeCounter[jj] = TIME_ADC + TimeEvent- 400.E-9*5.;
 
-            if(k==1 || k==3)FlagStat = false;
           }
         }
 
 
 
       }
-      Ttmp->Fill();
-
+        Ttmp->Fill();
     }
     /*
     TFile *tfile =new TFile("tt.root","UPDATE");
@@ -325,8 +340,6 @@ int DATA::GetIA_MUON(int data[Aperture]) {
       }
     }
   }
-  
-
 
   if (MaxAmplitude<=0 || iMaxAmplitude>990){
     INT_ADC = 0.;
@@ -339,42 +352,47 @@ int DATA::GetIA_MUON(int data[Aperture]) {
   INT_ADC = GADC->Integral(0, Aperture);
   AMP_ADC = MaxAmplitude; 
 
-  for(int i=iMaxAmplitude;i>=0;i--){
-    if(New[i]==0){
-      TIME_ADC = double(i)*5.E-9;
-      break;
+
+  double xmin;
+  double xmax; 
+  bool Fmin = false;
+  bool Fmax = false;
+
+  for(int i=iMaxAmplitude;i>0;i--){
+    if(Fmin==false && New[i]<=0.1*MaxAmplitude){
+      xmin = (double)(i+1);
+      Fmin = true;
     }
-  }  
-
-/*
-  double xmin = double(iMaxAmplitude) - 20.;
-  double xmax = double(iMaxAmplitude) + 20.; 
-  FitFunc = new TF1("FitFunc", "[2]*TMath::Gaus(x,[0],[1])",xmin,xmax);
-  FitFunc->SetParameters(iMaxAmplitude,5,1);
-  FitFunc->SetParLimits(0,iMaxAmplitude-4,iMaxAmplitude+4);
-
-  char  HistName[2];
-  sprintf(HistName,"%d",Nch);
-
-  GADC->Fit("FitFunc","Rq");
-
-  double A1 = FitFunc->GetParameter(2);
-  double A2 = FitFunc->GetParameter(0);
-  double A3 = FitFunc->GetParameter(1);
-
-  double Func = A2-sqrt(-2.*A3*A3*log(MaxAplitude/3./A1));
-*/
-
-
-/*
-  TIME_ADC = FitFunc->GetX(double(MaxAplitude)/3.,xmin,double(iMaxAmplitude));
-  if (TIME_ADC!=TIME_ADC){
-    TFile *tmp = new TFile("tmp.root", "UPDATE");
-     GADC->Write(HistName);
-    tmp->Close();
+    if(Fmax==false && New[i]<=0.6*MaxAmplitude){
+      xmax = (double)(i+1);
+      Fmax = true;
+    }
+    if(Fmax==true && Fmin==true)
+      break;
   }
-*/
-  //delete FitFunc;
+
+  double delx = xmax - xmin;
+  if (delx<0) delx *=-1.;
+  if(delx>=5 && MaxAmplitude>NOISE_RANGE){
+    FitFunc = new TF1("FitFunc", "[0]+[1]*x",xmin,xmax);
+    GADC->Fit("FitFunc","Rq");
+    double A1 = FitFunc->GetParameter(0);
+    double A2 = FitFunc->GetParameter(1);
+
+    TIME_ADC = -A1/A2;
+    TIME_ADC *= 5.E-9;
+    //TFile *tmp = new TFile("tmp.root", "UPDATE");
+    //GADC->Write();
+    //tmp->Close();    
+  }
+  else{
+    for(int i=iMaxAmplitude;i>=0;i--){
+      if(New[i]==0){
+        TIME_ADC = double(i)*5.E-9;
+        break;
+      }
+    }  
+  }
 
   delete GADC;
   return 0;
@@ -386,6 +404,9 @@ int DATA::GetIA_GRANDE(int Nch, int data[Aperture]) {
   int MaxAmplitude = 0.;
   double MeanADC = 0.;
   int EndMean;
+  int x1 = 0;
+  int x2 = 0;
+
 
   for (int i = 0; i < Aperture; i++) {
     New[i] = 0.;
@@ -400,7 +421,7 @@ int DATA::GetIA_GRANDE(int Nch, int data[Aperture]) {
     }
   }
 
-  EndMean = iMaxAmplitude - 20;
+  EndMean = 420;
   if (EndMean > 0) {
     int k = 0;
     for (int i = 400; i < EndMean; i++) {
@@ -450,7 +471,6 @@ int DATA::GetIA_GRANDE(int Nch, int data[Aperture]) {
     }
   }
 
-
   if (MaxAmplitude<=0){
     INT_ADC = 0.;
     AMP_ADC = 0;
@@ -462,37 +482,51 @@ int DATA::GetIA_GRANDE(int Nch, int data[Aperture]) {
   }
 
 
-  for(int i=iMaxAmplitude;i>=400;i--){
-    if(New[i]==0){
-      TIME_ADC = double(i)*5.E-9;
-      break;
-    }
-  }  
-
-
   GADC = new TGraph(Aperture, XAperture, New);
   INT_ADC = GADC->Integral(0, Aperture);
   AMP_ADC = MaxAmplitude;
 
-/*
-  TGraph *GADCt = new TGraph(Aperture, XAperture, tt);
-  GADC->SetLineColor(4);
-  GADC->SetLineWidth(3);
 
+  double xmin;
+  double xmax; 
+  bool Fmin = false;
+  bool Fmax = false;
 
-if(MaxAmplitude<10 && MaxAmplitude>0){
-  TCanvas *can = new TCanvas( "can", " ", 200, 10, 600, 400 );
-  char  HistName[3];
-  sprintf(HistName,"%d",Nch);
-  TFile *tmp = new TFile("tmp.root", "UPDATE");
-  GADCt->Draw();
-   GADC->Draw("same");
-   can->Write(HistName);
-  tmp->Close();
-  delete can;
-  delete GADCt;
-}
-*/
+  for(int i=400;i<600;i++){
+    if(Fmin==false && New[i]>=0.1*MaxAmplitude){
+      xmin = (double)i;
+      Fmin = true;
+    }
+    if(Fmax==false && New[i]>=0.6*MaxAmplitude){
+      xmax = (double)i;
+      Fmax = true;
+    }
+  }
+
+  double delx = xmin - xmax;
+  if (delx<0) delx *=-1.;
+  if(delx>=5 && MaxAmplitude>12){
+    FitFunc = new TF1("FitFunc", "[0]+[1]*x",xmin,xmax);
+    GADC->Fit("FitFunc","Rq");
+    double A1 = FitFunc->GetParameter(0);
+    double A2 = FitFunc->GetParameter(1);
+
+    TIME_ADC = -A1/A2;
+    TIME_ADC *= 5.E-9;
+    //TFile *tmp = new TFile("tmp.root", "UPDATE");
+    //GADC->Write();
+    //tmp->Close();    
+  }
+  else{
+    for(int i=400;i<600;i++){
+      if(New[i]!=0){
+        TIME_ADC = double(i-1);
+        break;
+       }
+    }
+    TIME_ADC *= 5.E-9;
+  }
+
   delete GADC;
   return 0;
 }
