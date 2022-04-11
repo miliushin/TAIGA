@@ -15,16 +15,14 @@
 class Coin3D {
 
 public:
-  Coin3D(const char *File1,const char *File2);
+  Coin3D(const char *File2);
   ~Coin3D();
 
 private:
-  TFile  *OutRoot;
   TFile  *Root_tmp;
   FILE   *FileTMP;
   FILE   *FileXYZ;
-  TH1F   *HTheta;
-  TH1F   *HPhi;
+  TTree  *ResultTree;
 
   double TimeCounter[NUM_OF_CHANNELS];
   double IntegCounter[NUM_OF_CHANNELS];
@@ -35,8 +33,12 @@ private:
   
   double **TimeTop;
   double **NpartTop;
+  int    **NDetTop;
 
   double ***TimeCoin;
+  double ***NpartTopCoin;
+  int    ***NDetCoin;
+
   double **NpartCoin;
   int    NCoin[MAX_OF_3DSTAT];
   int    nSt1, nSt2, nSt3;
@@ -47,10 +49,13 @@ private:
   double sY[MAX_OF_STAT];
   double sZ[MAX_OF_STAT];
 
+  double time;
   double Phi;
   double Theta;
   double ERR_Phi;
   double ERR_Theta;
+  double NparticalTop[MAX_OF_STAT];
+  int    NDet[MAX_OF_STAT];
 
   void   FindCoin(int iComb,int St1, int St2, int St3);
   double FindThetaPhi(int iComb,int iCoin);
