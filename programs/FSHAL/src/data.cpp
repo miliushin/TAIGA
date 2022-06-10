@@ -50,7 +50,8 @@ DATA::DATA(const char *File) {
 
   for (int i = 0; i < NumberOfTrees; i++) {
     NstName = RootData->GetListOfKeys()->At(i)->GetName();
-
+    if(NstName[0]=='M')
+    	continue;
     TTree *Ttmp = (TTree*)Root_tmp->Get(NstName);
     Ttmp->SetBranchAddress("Time", TimeCounter);
     Ttmp->SetBranchAddress("Amplitude", AmplCounter);
